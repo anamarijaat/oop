@@ -32,9 +32,9 @@ bool addFile(Directory &d, File &f){
     return true;
 }
 
-bool addDirectory(Directory &d_1, &d_2){
+bool addDirectory(Directory &d_1,Directory &d_2){
     for(size_t i = 0; i < d_1.dirs.size(); i++){
-        if (d_1.dirs->name[i] == d_2.name[i]){
+        if (d_1.dirs[i]->name == d_2.name){
             return false;
         }
     }
@@ -135,16 +135,16 @@ int main() {
     z.extension = "mov";
     z.byteSize = 1556281022;
 
-    addFile(x);
-    addFile(y);
-    addFile(z);
+    addFile(my,x);
+    addFile(my,y);
+    addFile(my,z);
 
     y.name = "YYY";
 
     Directory child;
     child.name = "Child One";
 
-    addDirectory(child);
+    addDirectory(my,child);
     
     Find(my, "z");
     
