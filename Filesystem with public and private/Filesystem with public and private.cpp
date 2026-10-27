@@ -11,8 +11,20 @@ private:
     string extension;
     uint64_t byteSize;
 public:
-    string getFullFilename() {
-        return name + '.' + extension;
+    string getFullFilename(File &f) {
+        return f.name + '.' + f.extension;
+    }
+    void setbyteSize(uint64_t n){
+        byteSize = n;
+    }
+    void setname(const string n){
+        name = n;
+    }
+    void setextension(const string n){
+        extension = n;
+    }
+    uint64_t getbyteSize(){
+        return byteSize;
     }
 };
 
@@ -24,9 +36,13 @@ private:
     vector<Directory *> dirs;
     Directory *up;
 public:
+    void setname(const string n){
+        name = n;
+    }
+    
     bool addFile(Directory &d, File &f){
         for (size_t i = 0; i < d.files.size(); i++){
-            if (getFullFilename(*d.files[i]) == getFullFilename(f)){
+            if (f.getFullFilename(*d.files[i]) == f.getFullFilename(f)){
                 return false;
             }
         }
@@ -57,7 +73,7 @@ public:
     uint64_t getDirectorySize(Directory &d) {
         uint64_t sz = 0;
         for (size_t i = 0; i < d.files.size(); i++) {
-            sz += d.files[i]->byteSize;
+            sz += d.files[i]->getbyteSize();
         }
         for (size_t i = 0; i < d.dirs.size(); i++){
             sz += getDirectorySize(*d.dirs[i]);
@@ -69,7 +85,7 @@ public:
     bool moveFile(const string &filename, Directory &from, Directory &to) {
         File *file = nullptr;
         for (size_t i = 0; i < from.files.size(); i++) {
-            if (filename == getFullFilename(*from.files[i])) {
+            if (filename == from.files[i]->getFullFilename(*from.files[i])) {
                 file = from.files[i];
                 for (size_t j = i; j < from.files.size() - 1; j++) {
                     from.files[j] = from.files[j + 1];
@@ -87,7 +103,7 @@ public:
         std::cout << "d: " << d.name << '\n';
         
         for (size_t i = 0; i < d.files.size(); i++) {
-            std::cout << " f " << getFullFilename(*d.files[i]) << '\n';
+            std::cout << " f " << d.files[i]->getFullFilename(*d.files[i]) << '\n';
         }
         for (size_t i = 0; i < d.dirs.size(); i++) {
             printDir(*d.dirs[i]);
@@ -98,7 +114,7 @@ public:
 
     bool Find(Directory &d, const string &target) {
         for (size_t i = 0; i < d.files.size(); i++) {
-            if (getFullFilename(*d.files[i]) == target) {
+            if (d.files[i]->getFullFilename(*d.files[i]) == target) {
                 cout << "File found: " << target << endl;
                 return true;
             }
@@ -126,41 +142,41 @@ public:
 
 int main() {
     Directory my;
-    my.name = "documents";
+    my.setname("documents");
     File x, y, z;
-    x.name = "X";
-    x.extension = "txt";
-    x.byteSize = 1024;
+    x.setname("X");
+    x.setextension("txt");
+    x.setbyteSize(1024);
 
-    y.name = "Y";
-    y.extension = "jpeg";
-    y.byteSize = 56281022;
+    y.setname("Y");
+    y.setextension("jpeg");
+    y.setbyteSize(56281022);
 
-    z.name = "z";
-    z.extension = "mov";
-    z.byteSize = 1556281022;
+    z.setname("z");
+    z.setextension("mov");
+    z.setbyteSize(1556281022);
 
-    addFile(my,x);
-    addFile(my,y);
-    addFile(my,z);
+    my.addFile(my,x);
+    my.addFile(my,y);
+    my.addFile(my,z);
 
-    y.name = "YYY";
+    y.setname("YYY");
 
     Directory child;
-    child.name = "Child One";
+    child.setname("Child One");
 
-    addDirectory(my,child);
+    my.addDirectory(my,child);
     
-    Find(my, "z");
+    my.Find(my, "z");
     
 
-    printDir(my);
+    my.printDir(my);
 
-    moveFile(getFullFilename(z), my, child);
+    my.moveFile(z.getFullFilename(z), my, child);
     cout << "AFTER MOVE\n";
-    printDir(my);
+    my.printDir(my);
 
-    printDir(child);
+    my.printDir(child);
     return 0;
 }
 
